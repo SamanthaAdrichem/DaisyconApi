@@ -11,8 +11,7 @@
 			'end' => "2014-10-01" 
 		);
 		$sUrl = '/advertisers/' . $iAdvertiserId . '/transactions';
-		$aFilter = array();
-		foreach ($oApiCall->performCall($sUrl, DaisyconRestApi::REQUEST_GET, $aFilter) as $oTransaction)
+		foreach ($oApiCall->performCall($sUrl, DaisyconRestApi::REQUEST_GET, $aFilterData) as $oTransaction)
 		{
 			var_dump( $oTransaction );break; // stop @ 1
 		}
