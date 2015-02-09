@@ -15,6 +15,7 @@
 	class Rest
 	{
 
+		const REQUEST_POSTGET = 'POSTGET';
 		const REQUEST_GET = 'GET';
 		const REQUEST_POST = 'POST';
 		const REQUEST_PUT = 'PUT';
@@ -124,7 +125,7 @@
 			$aHeaders = array( 
 				'Authorization: Basic ' . base64_encode( $this->sUsername . ':' . $this->sPassword ) ,
 			);
-			if ( self::REQUEST_GET === $eRequestType )
+			if ( self::REQUEST_GET === $eRequestType && strlen(serialize($aData)) <= 3000)
 			{
 				$sChar = false === stripos($sRequestUrl, "?") ? "?" : "&";
 				foreach ($aData as $sKey => $mValue)
@@ -136,12 +137,21 @@
 			else
 			{
 				curl_setopt( $rCurlHandler, CURLOPT_POST, true);
-				curl_setopt( $rCurlHandler, CURLOPT_POSTFIELDS, json_encode($aData) );
 				if ( self::REQUEST_PUT == $eRequestType )
 				{
 					curl_setopt( $rCurlHandler, CURLOPT_CUSTOMREQUEST, "PUT");
 				}
+				if ( true === in_array($eRequestType, array(self::REQUEST_POSTGET, self::REQUEST_GET)) )
+				{
+					$aHeaders[] = 'X-HTTP-Method-Override: GET';
+					curl_setopt( $rCurlHandler, CURLOPT_POSTFIELDS, $aData );
+				}
+				else
+				{
+					curl_setopt( $rCurlHandler, CURLOPT_POSTFIELDS, json_encode($aData) );
+				}
 			}
+
 			curl_setopt( $rCurlHandler, CURLOPT_URL, $sRequestUrl);
 			curl_setopt( $rCurlHandler, CURLOPT_HTTPHEADER, $aHeaders);
 			curl_setopt( $rCurlHandler, CURLOPT_RETURNTRANSFER, true);
