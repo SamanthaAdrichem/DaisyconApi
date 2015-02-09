@@ -1,6 +1,6 @@
 <?php
 
-	namespace Daisycon\Api;
+	namespace DaisyconApi;
 
 	/**
 	 * Small Daisycon rest api class
