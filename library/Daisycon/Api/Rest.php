@@ -1,5 +1,7 @@
 <?php
 
+	namespace Daisycon\Api;
+
 	/**
 	 * Small Daisycon rest api class
 	 * Simple calls, just check the url in the documentation on https://developers.daisycon.com
@@ -10,7 +12,7 @@
 	 *  for example /advertisers/{advertiser_id}/transactions
 	 *  becomes ->getAdvertisersTransactions( ADVERTISERID, array(FILTER_FIELD => VALUE) );
 	 */
-	class DaisyconRestApi
+	class Rest
 	{
 
 		const REQUEST_GET = 'GET';
