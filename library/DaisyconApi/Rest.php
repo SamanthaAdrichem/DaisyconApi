@@ -1,6 +1,8 @@
 <?php
 
 	namespace DaisyconApi;
+	
+	use Exception;
 
 	/**
 	 * Small Daisycon rest api class
