@@ -1,7 +1,7 @@
 <?php
 
 	namespace DaisyconApi;
-	
+
 	use Exception;
 
 	/**
@@ -25,6 +25,7 @@
 		protected $sApiBaseUrl = "https://services.daisycon.com";
 		protected $sUsername;
 		protected $sPassword;
+		protected $aResponseHeaders = array();
 
 		public function __construct( $sUsername, $sPassword )
 		{
@@ -117,6 +118,21 @@
 			return $aAdvertiserIds;
 		}
 
+		protected function handleResponseHeaders( $rCurlHandler, $sHeaderLine )
+		{
+			@list($sHeader, $sHeaderContent) = explode(": ", $sHeaderLine);
+			if (false !== strpos($sHeader, 'X-'))
+			{
+				$this->aResponseHeaders[ $sHeader ] = trim($sHeaderContent);
+			}
+			return strlen($sHeaderLine);
+		}
+
+		public function getResponseHeaders()
+		{
+			return $this->aResponseHeaders;
+		}
+
 		public function performCall( $sRequestUrl, $eRequestType = self::REQUEST_GET, $aData = array() )
 		{
 			if (false === stripos( $sRequestUrl, $this->sApiBaseUrl ))
@@ -159,6 +175,7 @@
 			curl_setopt( $rCurlHandler, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt( $rCurlHandler, CURLOPT_SSL_VERIFYHOST, 0);
 			curl_setopt( $rCurlHandler, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt( $rCurlHandler, CURLOPT_HEADERFUNCTION, array(&$this, 'handleResponseHeaders'));
 
 			$sResponse = curl_exec( $rCurlHandler );
 			$iResponseCode = curl_getinfo( $rCurlHandler, CURLINFO_HTTP_CODE);
