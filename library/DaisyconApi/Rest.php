@@ -17,22 +17,71 @@
 	class Rest
 	{
 
+		/**
+		 * @var string perform get call using post
+		 */
 		const REQUEST_POSTGET = 'POSTGET';
+
+		/**
+		 * @var string perform get call
+		 */
 		const REQUEST_GET = 'GET';
+
+		/**
+		 * @var string perform post call
+		 */
 		const REQUEST_POST = 'POST';
+
+		/**
+		 * @var string perform put call
+		 */
 		const REQUEST_PUT = 'PUT';
 
+		/**
+		 * @var string api base url
+		 */
 		protected $sApiBaseUrl = "https://services.daisycon.com";
+
+		/**
+		 * @var string api username
+		 */
 		protected $sUsername;
+
+		/**
+		 * @var string api password
+		 */
 		protected $sPassword;
+
+		/**
+		 * @var array last response headers
+		 */
 		protected $aResponseHeaders = array();
 
+		/**
+		 * @var integer last response code
+		 */
+		protected $iLastResponseCode = 0;
+
+		/**
+		 * Constructor function
+		 * @param string $sUsername
+		 * @param string $sPassword
+		 */
 		public function __construct( $sUsername, $sPassword )
 		{
 			$this->sUsername = $sUsername;
 			$this->sPassword = $sPassword;
 		}
 
+		/**
+		 * Magic __call function that allows for partial pathwise api calls for example
+		 * getPublishersMedia( publisher_id, filter )
+		 * getPublishersMedia( publisher_id, media_id, filter )
+		 * getPublishersMedia( publisher_id, media_id, 'subscriptions', filter )
+		 * @param string $sFunctionName
+		 * @param array $aArguments
+		 * @return \DaisyconApi\Rest::performCall
+		 */
 		public function __call( $sFunctionName, $aArguments )
 		{
 			$aPath = array();
@@ -64,6 +113,10 @@
 			return $this->performCall( $sRequestUrl, $eRequestType, $aData );
 		}
 
+		/**
+		 * Retrieve all your connected publishers
+		 * @return array
+		 */
 		public function getPublishers()
 		{
 			try
@@ -80,6 +133,10 @@
 			return array();
 		}
 
+		/**
+		 * Retrieve all your connected publisher ids
+		 * @return array
+		 */
 		public function getPublisherIds()
 		{
 			$oPublishers = $this->getPublishers();
@@ -91,6 +148,10 @@
 			return $aPublisherIds;
 		}
 
+		/**
+		 * Retrieve all your connected advertisers
+		 * @return array
+		 */
 		public function getAdvertisers()
 		{
 			try
@@ -107,6 +168,10 @@
 			return array();
 		}
 
+		/**
+		 * Retrieve all your connected advertiser ids
+		 * @return array
+		 */
 		public function getAdvertiserIds()
 		{
 			$oAdvertisers = $this->getAdvertisers();
@@ -118,6 +183,12 @@
 			return $aAdvertiserIds;
 		}
 
+		/**
+		 * Handles response headers, only returns custom response headers starting with X-, can be overloaded
+		 * @param resource $rCurlHandler cURL handle
+		 * @param string $sHeaderLine
+		 * @return integer
+		 */
 		protected function handleResponseHeaders( $rCurlHandler, $sHeaderLine )
 		{
 			@list($sHeader, $sHeaderContent) = explode(": ", $sHeaderLine);
@@ -128,11 +199,32 @@
 			return strlen($sHeaderLine);
 		}
 
+		/**
+		 * Returns the response headers of the last call
+		 * @return array
+		 */
 		public function getResponseHeaders()
 		{
 			return $this->aResponseHeaders;
 		}
 
+		/**
+		 * Returns the response code of the last call 0 if none
+		 * @return integer
+		 */
+		public function getLastResponseCode()
+		{
+			return (int) $this->iLastResponseCode;
+		}
+
+		/**
+		 * Performs a cURL call to the Daisycon Api
+		 * @param string $sRequestUrl
+		 * @param constant $eRequestType
+		 * @param array $aData
+		 * @throws \Exception if response header isn't valid
+		 * @return null|\stdClass
+		 */
 		public function performCall( $sRequestUrl, $eRequestType = self::REQUEST_GET, $aData = array() )
 		{
 			if (false === stripos( $sRequestUrl, $this->sApiBaseUrl ))
@@ -178,16 +270,17 @@
 			curl_setopt( $rCurlHandler, CURLOPT_HEADERFUNCTION, array(&$this, 'handleResponseHeaders'));
 
 			$sResponse = curl_exec( $rCurlHandler );
-			$iResponseCode = curl_getinfo( $rCurlHandler, CURLINFO_HTTP_CODE);
+			$this->iLastResponseCode = curl_getinfo( $rCurlHandler, CURLINFO_HTTP_CODE);
 			$oResponse = @json_decode($sResponse);
 
 			$sErrorMessage = isset($oResponse->error) ? $oResponse->error : '';
 
 			curl_close( $rCurlHandler );
 
-			switch ( $iResponseCode )
+			switch ( $this->iLastResponseCode )
 			{
-				case 200:
+				case 200: // OK
+				case 201: // Created
 				{
 					return $oResponse;
 				}
@@ -213,7 +306,7 @@
 
 				default:
 				{
-					throw new Exception("Http resonse error " . $iResponseCode . ": " . $sErrorMessage, $iResponseCode);
+					throw new Exception("Http resonse error " . $this->iLastResponseCode . ": " . $sErrorMessage, $this->iLastResponseCode);
 				}
 				break;
 			}
