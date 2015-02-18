@@ -80,7 +80,8 @@
 		 * getPublishersMedia( publisher_id, media_id, 'subscriptions', filter )
 		 * @param string $sFunctionName
 		 * @param array $aArguments
-		 * @return \DaisyconApi\Rest::performCall
+		 * @see \DaisyconApi\Rest::performCall
+		 * @return null|\stdClass
 		 */
 		public function __call( $sFunctionName, $aArguments )
 		{
@@ -223,6 +224,7 @@
 		 * @param constant $eRequestType
 		 * @param array $aData
 		 * @throws \Exception if response header isn't valid
+		 * @see \DaisyconApi\Rest::handleResponse
 		 * @return null|\stdClass
 		 */
 		public function performCall( $sRequestUrl, $eRequestType = self::REQUEST_GET, $aData = array() )
@@ -232,7 +234,7 @@
 				$sRequestUrl =  $this->sApiBaseUrl . $sRequestUrl;
 			}
 			$rCurlHandler = curl_init();
-			$aHeaders = array( 
+			$aHeaders = array(
 				'Authorization: Basic ' . base64_encode( $this->sUsername . ':' . $this->sPassword ) ,
 			);
 			if ( self::REQUEST_GET === $eRequestType && strlen(serialize($aData)) <= 3000)
@@ -270,12 +272,26 @@
 			curl_setopt( $rCurlHandler, CURLOPT_HEADERFUNCTION, array(&$this, 'handleResponseHeaders'));
 
 			$sResponse = curl_exec( $rCurlHandler );
+			$mReturn = $this->handleResponse( $rCurlHandler, $sResponse );
+
+			curl_close( $rCurlHandler );
+
+			return $mReturn;
+		}
+
+		/**
+		 * Handles response so that it can be extended
+		 * @param resource $rCurlHandler cURL handle
+		 * @param string $sResponse
+		 * @throws \Exception if response header isn't valid
+		 * @return null|\stdClass
+		 */
+		protected function handleResponse( $rCurlHandler, $sResponse )
+		{
 			$this->iLastResponseCode = curl_getinfo( $rCurlHandler, CURLINFO_HTTP_CODE);
 			$oResponse = @json_decode($sResponse);
 
 			$sErrorMessage = isset($oResponse->error) ? $oResponse->error : '';
-
-			curl_close( $rCurlHandler );
 
 			switch ( $this->iLastResponseCode )
 			{
