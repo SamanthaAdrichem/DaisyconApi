@@ -256,12 +256,15 @@
 				if ( true === in_array($eRequestType, array(self::REQUEST_POSTGET, self::REQUEST_GET)) )
 				{
 					$aHeaders[] = 'X-HTTP-Method-Override: GET';
-					curl_setopt( $rCurlHandler, CURLOPT_POSTFIELDS, $aData );
 				}
 				else
 				{
-					curl_setopt( $rCurlHandler, CURLOPT_POSTFIELDS, json_encode($aData) );
+					if (true == isset($aData['body']))
+					{
+						$aData['body'] = json_encode($aData['body']);
+					}
 				}
+				curl_setopt( $rCurlHandler, CURLOPT_POSTFIELDS, $aData );
 			}
 
 			curl_setopt( $rCurlHandler, CURLOPT_URL, $sRequestUrl);
