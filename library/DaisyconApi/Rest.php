@@ -38,6 +38,11 @@
 		const REQUEST_PUT = 'PUT';
 
 		/**
+		 * @var string perform delete call
+		 */
+		const REQUEST_DELETE = 'DELETE';
+
+		/**
 		 * @var string api base url
 		 */
 		protected $sApiBaseUrl = "https://services.daisycon.com";
@@ -89,7 +94,7 @@
 			preg_match_all('/((?:^|[A-Z])[a-z]+)/', $sFunctionName, $aPath);
 			$aPath = array_map("strtolower", $aPath[0]);
 			$eRequestType = strtoupper( array_shift($aPath) );
-			if (false === in_array( $eRequestType, array( self::REQUEST_GET, self::REQUEST_POST, self::REQUEST_PUT ) ) )
+			if (false === in_array( $eRequestType, array( self::REQUEST_GET, self::REQUEST_POST, self::REQUEST_PUT, self::REQUEST_DELETE ) ) )
 			{
 				throw new Exception("Unknown request type: " . $eRequestType );
 			}
@@ -245,6 +250,10 @@
 					$sRequestUrl .= $sChar . $sKey . "=" . urlencode( $mValue );
 					$sChar = "&";
 				}
+			}
+			else if ( self::REQUEST_DELETE === $eRequestType )
+			{
+				curl_setopt( $rCurlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
 			}
 			else
 			{
