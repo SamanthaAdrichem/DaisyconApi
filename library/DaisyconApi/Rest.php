@@ -310,6 +310,7 @@
 			{
 				case 200: // OK
 				case 201: // Created
+				case 202: // Accepted
 				{
 					return $oResponse;
 				}
