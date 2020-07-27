@@ -121,7 +121,7 @@
 
 		/**
 		 * Retrieve all your connected publishers
-		 * @return array
+		 * @return \stdClass|array
 		 */
 		public function getPublishers()
 		{
@@ -230,7 +230,7 @@
 		 * @param array $aData
 		 * @throws \Exception if response header isn't valid
 		 * @see \DaisyconApi\Rest::handleResponse
-		 * @return null|\stdClass
+		 * @return null|\stdClass|array
 		 */
 		public function performCall( $sRequestUrl, $eRequestType = self::REQUEST_GET, $aData = array() )
 		{
@@ -241,6 +241,7 @@
 			$rCurlHandler = curl_init();
 			$aHeaders = array(
 				'Authorization: Basic ' . base64_encode( $this->sUsername . ':' . $this->sPassword ) ,
+				'Content-Type: application/json'
 			);
 			if ( self::REQUEST_GET === $eRequestType && strlen(serialize($aData)) <= 3000)
 			{
