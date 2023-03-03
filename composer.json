@@ -1,22 +1,33 @@
 {
-    "name": "samanthaadrichem/daisycon-api",
-    "type": "library",
-    "description": "Quick Daisycon Api Helper Class",
-    "keywords": [
-        "Daisycon",
-        "Api"
-    ],
-    "authors": [
-        {
-            "name": "Samantha Adrichem"
-        }
-    ],
-    "require": {
-        "ext-curl": "*",
-        "ext-json": "*",
-        "php": ">=5.5"
-    },
-    "autoload": {
-        "psr-0": { "DaisyconApi\\": "library/" }
-    }
+	"name": "samanthaadrichem/daisycon-api",
+	"type": "library",
+	"description": "Quick Daisycon Api Helper Class",
+	"keywords": [
+		"Daisycon",
+		"Api"
+	],
+	"authors": [
+		{
+			"name": "Samantha Adrichem"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"SamanthaAdrichem\\DaisyconApi\\": "library/"
+		}
+	},
+	"config": {
+		"platform": {
+			"php": "8.1.6"
+		},
+		"process-timeout": 1800,
+		"sort-packages": true
+	},
+	"require": {
+		"php": "^8.1",
+		"ext-curl": "*",
+		"ext-json": "*",
+		"daisyconbv/oauth-examples": "^1.0",
+		"symfony/serializer": "6.1.1"
+	}
 }

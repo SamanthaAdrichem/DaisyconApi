@@ -1,0 +1,37 @@
+# Project specific
+daisycon-api-token.json
+test.php
+opt/**
+
+# Generic
+.externalToolBuilders
+.project
+.buildpath
+.settings
+.phpunit.result.cache
+tmp/
+.DS_Store
+/data
+/conf
+/vendor/*
+*.php.pid
+**/nbproject
+**.pid
+**/*.pid
+.editorconfig
+*.komodo*
+.idea
+/_windows
+/inspection
+colors.scheme.xml
+databaseDrivers.xml
+debugger.xml
+diff.xml
+ide.general.xml
+ignore.xml
+IntelliLang.xml
+web-browsers.xml
+logs/
+
+# Windows image file caches
+Thumbs.db
